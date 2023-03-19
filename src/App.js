@@ -1,24 +1,16 @@
 import React, {useState} from 'react';
 import './styles/App.css';
+import PostItem from './components/PostItem';
 
 function App() {
-  const [value, setValue] = useState('Some text')
+    const [value, setValue] = useState('Some text')
 
-  return (
-    <div className="App">
-        <div className="post">
-          <div className="post__content">
-            <strong>1. Javascript</strong>
-            <div>
-              Javascript - programming language.
-            </div>
-          </div>
-          <div className="post__btn">
-            <button>Delete</button>
-          </div>
+    return (
+        <div className="App">
+            <PostItem post={{id: 1, title: 'Javascript', body: 'Programming language'}}/>
+            <PostItem post={{id: 2, title: 'Python', body: 'Another programming language'}}/>
         </div>
-    </div>
-  );
+    );
 }
 
 export default App;
