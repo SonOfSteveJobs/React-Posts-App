@@ -2,8 +2,9 @@ import React, {useMemo, useState} from 'react';
 import './styles/App.css';
 import PostList from './components/Postlist';
 import PostForm from './components/PostForm';
-import MySelect from './components/UI/select/MySelect';
-import MyInput from './components/UI/input/MyInput';
+import PostFilter from './components/PostFilter';
+import MyModal from './components/UI/modal/MyModal';
+import MyButton from './components/UI/button/MyButton';
 
 function App() {
     const [posts, setPosts] = useState([
@@ -12,50 +13,42 @@ function App() {
         {id: 3, title: 'Rust', body: 'Another programming language (one more)'},
     ]);
 
-    const [selectedSort, setSelectedSort] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
+    const [filter, setFilter] = useState({sort: '', query: ''});
+    const [modal, setModal] = useState(false)
 
     const sortedPosts = useMemo(() => {
-        if (selectedSort) {
-            return [...posts].sort((a, b) => a[selectedSort].localeCompare(b[selectedSort]));
+        if (filter.sort) {
+            return [...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]));
         }
 
         return posts;
-    }, [selectedSort, posts]);
+    }, [filter.sort, posts]);
 
     const sortedAndSearchedPosts = useMemo(() => {
-        return sortedPosts.filter((post) => post.title.toLowerCase().includes(searchQuery.toLowerCase()));
-    }, [searchQuery, sortedPosts])
+        return sortedPosts.filter((post) => post.title.toLowerCase().includes(filter.query.toLowerCase()));
+    }, [filter.query, sortedPosts])
 
     // const bodyInputRef = useRef(); неуправляемый компоненет
-
-    const createPost = (newPost) => setPosts([...posts, newPost]);
-
+    const createPost = (newPost) => {
+        setPosts([...posts, newPost]);
+        setModal(false);
+    };
     const removePost = (post) => setPosts(posts.filter((p) => p.id !== post.id));
-
-    const sortPosts = (sort) => {
-        setSelectedSort(sort);
-    }
 
     return (
         <div className="App">
-            <PostForm create={createPost}/>
+            <MyButton style={{marginTop: 30}} onClick={() => setModal(true)}>
+                Create Post
+            </MyButton>
+            <MyModal visible={modal} setVisible={setModal}>
+                <PostForm create={createPost}/>
+            </MyModal>
             <hr style={{margin: '20px 0'}}/>
-            <MyInput
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+            <PostFilter
+                filter={filter}
+                setFilter={setFilter}
             />
-            <MySelect
-                value={selectedSort}
-                onChange={sortPosts}
-                defaultValue="Sort by"
-                options={[{value: 'title', name: 'Name'}, {value: 'body', name: 'Description'}]}
-            />
-            {sortedAndSearchedPosts.length !== 0
-                ? <PostList posts={sortedAndSearchedPosts} remove={removePost} title={'Posts list №1'}></PostList>
-                : <h1 style={{textAlign: 'center'}}>Posts not found!</h1>}
-
+            <PostList posts={sortedAndSearchedPosts} remove={removePost} title={'Posts list №1'}></PostList>
         </div>
     );
 }

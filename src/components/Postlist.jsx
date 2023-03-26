@@ -1,7 +1,13 @@
 import React from 'react';
 import PostItem from './PostItem';
 
-const Postlist = ({posts, title, remove}) => {
+const PostList = ({posts, title, remove}) => {
+    if (!posts.length) {
+        return (
+            <h1 style={{textAlign: 'center'}}>Posts not found!</h1>
+        )
+    }
+
     return (
         <div>
             <h1 style={{textAlign: 'center'}}>{title}</h1>
@@ -10,4 +16,4 @@ const Postlist = ({posts, title, remove}) => {
     );
 };
 
-export default Postlist;
+export default PostList;
