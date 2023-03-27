@@ -8,35 +8,24 @@ import MyButton from './components/UI/button/MyButton';
 import {usePosts} from './hooks/usePosts';
 import PostService from './API/PostService';
 import Loader from './components/UI/loader/Loader';
+import {useFetching} from './hooks/useFetching';
 
 function App() {
-    const [posts, setPosts] = useState([
-        {id: 1, title: 'Javascript', body: 'Programming language.'},
-        {id: 2, title: 'Python', body: 'Another programming language.'},
-        {id: 3, title: 'Rust', body: 'Another programming language (one more)'},
-    ]);
-
+    const [posts, setPosts] = useState([]);
     const [filter, setFilter] = useState({sort: '', query: ''});
     const [modal, setModal] = useState(false);
-    const [isPostsLoading, setIsPostsLoading] = useState(false);
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
 
+    const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
+        const response = await PostService.getAll();
+        setPosts(response);
+    })
     // const bodyInputRef = useRef(); неуправляемый компоненет
     const createPost = (newPost) => {
         setPosts([...posts, newPost]);
         setModal(false);
     };
     const removePost = (post) => setPosts(posts.filter((p) => p.id !== post.id));
-
-    const fetchPosts = async () => {
-        setIsPostsLoading(true)
-        setTimeout(async () => {
-            const response = await PostService.getAll();
-            setPosts(response);
-            setIsPostsLoading(false);
-        }, 1000);
-
-    };
 
     useEffect(() => {
         fetchPosts();
@@ -55,6 +44,7 @@ function App() {
                 filter={filter}
                 setFilter={setFilter}
             />
+            {postError && <h1>Error: {postError}</h1>}
             {isPostsLoading
                 ? <div style={{marginTop: 50, justifyContent: 'center', display: 'flex'}}><Loader/></div>
                 : <PostList posts={sortedAndSearchedPosts} remove={removePost} title={'Posts list №1'}></PostList>
