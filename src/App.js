@@ -6,7 +6,8 @@ import PostFilter from './components/PostFilter';
 import MyModal from './components/UI/modal/MyModal';
 import MyButton from './components/UI/button/MyButton';
 import {usePosts} from './hooks/usePosts';
-import axios from 'axios';
+import PostService from './API/PostService';
+import Loader from './components/UI/loader/Loader';
 
 function App() {
     const [posts, setPosts] = useState([
@@ -17,6 +18,7 @@ function App() {
 
     const [filter, setFilter] = useState({sort: '', query: ''});
     const [modal, setModal] = useState(false);
+    const [isPostsLoading, setIsPostsLoading] = useState(false);
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
 
     // const bodyInputRef = useRef(); неуправляемый компоненет
@@ -27,8 +29,13 @@ function App() {
     const removePost = (post) => setPosts(posts.filter((p) => p.id !== post.id));
 
     const fetchPosts = async () => {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts');
-        setPosts(response.data);
+        setIsPostsLoading(true)
+        setTimeout(async () => {
+            const response = await PostService.getAll();
+            setPosts(response);
+            setIsPostsLoading(false);
+        }, 1000);
+
     };
 
     useEffect(() => {
@@ -37,7 +44,6 @@ function App() {
 
     return (
         <div className="App">
-            <button onClick={fetchPosts}>Get Posts</button>
             <MyButton style={{marginTop: 30}} onClick={() => setModal(true)}>
                 Create Post
             </MyButton>
@@ -49,7 +55,10 @@ function App() {
                 filter={filter}
                 setFilter={setFilter}
             />
-            <PostList posts={sortedAndSearchedPosts} remove={removePost} title={'Posts list №1'}></PostList>
+            {isPostsLoading
+                ? <div style={{marginTop: 50, justifyContent: 'center', display: 'flex'}}><Loader/></div>
+                : <PostList posts={sortedAndSearchedPosts} remove={removePost} title={'Posts list №1'}></PostList>
+            }
         </div>
     );
 }
