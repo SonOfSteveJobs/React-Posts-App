@@ -46,3 +46,27 @@
     opacity: 0;
     transition: all 500ms ease-in;
 }
+
+.page__wrapper {
+    margin-top: 30px;
+    display: flex;
+}
+
+.page {
+    padding: 5px 15px;
+    color: cornflowerblue;
+    font-size: 14px;
+    background: transparent;
+    border: 1px solid cornflowerblue;
+    cursor: pointer;
+}
+
+.active__page {
+    padding: 5px 15px;
+    color: black;
+    font-size: 14px;
+    background: transparent;
+    border: 3px solid dodgerblue;
+    cursor: pointer;
+    font-weight: bold;
+}
