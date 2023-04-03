@@ -1,27 +1,42 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Navigate, Route, Routes} from 'react-router-dom';
-import About from '../../../pages/About';
-import Posts from '../../../pages/Posts';
-import PostIdPage from '../../../pages/PostIdPage';
-import {routes} from '../../../router';
+import {publicRoutes, privateRoutes} from '../../../router';
+import {AuthContext} from '../../../context';
+import Loader from '../loader/Loader';
 
 const AppRouter = () => {
-  return (
-      <Routes>
-        <Route path="/about" element={<About/>}/>
-        <Route exact path="/posts" element={<Posts/>}/>
-        <Route exact path="/posts/:id" element={<PostIdPage/>}/>
-        {routes.map((route) => {
-          return (
-              <Route
-                  exact={route.exact}
-                  path={route.path}
-                  element={route.component}
-              />)
-        })}
-        <Route path="*" element={<Navigate to="/posts"/>}/>
-      </Routes>
-  );
+    const {isAuth, isLoading} = useContext(AuthContext);
+    if (isLoading) {
+        return <Loader/>
+    }
+    return (
+        isAuth
+            ? <Routes>
+                {privateRoutes.map((route, index) => {
+                    return (
+                        <Route
+                            exact={route.exact}
+                            path={route.path}
+                            element={route.component}
+                            key={index + 1}
+                        />)
+                })}
+                <Route path="*" element={<Navigate to="/posts"/>}/>
+            </Routes>
+            : <Routes>
+                {publicRoutes.map((route, index) => {
+                    return (
+                        <Route
+                            exact={route.exact}
+                            path={route.path}
+                            element={route.component}
+                            key={index + 1}
+                        />)
+                })}
+                <Route path="*" element={<Navigate to="/login"/>}/>
+            </Routes>
+
+    );
 };
 
 export default AppRouter;
