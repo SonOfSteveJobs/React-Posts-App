@@ -1,1 +1,1 @@
-# just an app
+React posts app
